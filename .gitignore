@@ -4,6 +4,10 @@
 # Ignore data folders
 data/
 
+# private consts
+src/private_consts.py
+
+
 # Ignore Python cache
 __pycache__/
 *.pyc
