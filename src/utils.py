@@ -1,7 +1,11 @@
 import faiss
 import fitz
+import google.generativeai as genai
+from sentence_transformers import SentenceTransformer
 
-from consts import CHUNK_SIZE
+from consts import *
+from model_answering import answer_with_model
+from private_consts import GEMINI_API_KEY
 
 
 def pdf_to_pages(pdf_path):
@@ -36,3 +40,19 @@ def build_faiss_index(embeddings):
     index = faiss.IndexFlatL2(dim)  # Simple L2 distance index
     index.add(embeddings)
     return index
+
+
+def init_for_rag():
+    # define models
+    genai.configure(api_key=GEMINI_API_KEY)
+    answering_model = genai.GenerativeModel(MODEL_NAME)
+    st_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
+
+    # read saved data
+    index = faiss.read_index(DATA_FAISS_INDEX)
+    with open(DATA_CHUNKS_METADATA, "r", encoding="utf-8") as f:
+        metadata = [line.strip() for line in f]
+    with open(DATA_CHUNKS_TEXT, "r", encoding="utf-8") as f:
+        chunks = [line.strip() for line in f]
+
+    return (st_model, index, chunks, metadata, answering_model)
