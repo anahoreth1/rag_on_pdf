@@ -39,6 +39,7 @@ def create_faiss_index():
     print("FAISS index built.")
 
     # 5. Save the data
+    os.makedirs(PROCESSED_DATA_FOLDER, exist_ok=True)
     faiss.write_index(index, DATA_FAISS_INDEX)
     with open(DATA_CHUNKS_METADATA, "w", encoding="utf-8") as f:
         for meta in metadata:

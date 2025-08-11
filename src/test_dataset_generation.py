@@ -106,6 +106,8 @@ def generate_test_dataset():
                     print(f"[ERROR] {pdf_file} chunk {idx}: {e}")
 
     all_entries_df = pd.DataFrame(all_entries)
+
+    os.makedirs(TEST_DATA_FOLDER, exist_ok=True)
     all_entries_df.to_csv(TEST_DATA_CSV, index=False, encoding="utf-8")
     print(f"Dataset saved to {TEST_DATA_CSV}, total {len(all_entries_df)} Q&A pairs")
 
