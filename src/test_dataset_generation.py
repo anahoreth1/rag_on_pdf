@@ -30,23 +30,35 @@ def generate_prompt(chunk_text):
     return prompt
 
 
-def generate_qa_from_chunk(chunk_text, model, chunk_id, pdf_name):
-    """Generates Q&A pairs for a given chunk."""
+def generate_qa_from_chunk(
+    chunk_text: str, model, chunk_id: int, pdf_name: str
+) -> list[dict]:
+    """
+    Generates Q&A pairs for a given chunk of text using the provided model.
 
-    prompt = generate_prompt(chunk_text)
+    Args:
+        chunk_text (str): The text chunk to generate questions and answers from.
+        model: The LLM model object with a .generate_content() method.
+        chunk_id (int): The index of the chunk in the PDF.
+        pdf_name (str): The name of the PDF file.
 
+    Returns:
+        list[dict]: List of dictionaries with keys 'question', 'answer', 'chunk_id', 'pdf_name'.
+                    If parsing fails, returns a list with one dict containing the raw response.
+    """
+    prompt: str = generate_prompt(chunk_text)
     response = model.generate_content(prompt)
-    raw_text = response.text.strip()
+    raw_text: str = response.text.strip()
 
     # Remove optional code block markers like ```json ... ```
     if raw_text.startswith("```"):
         raw_text = raw_text.strip("`")  # remove backticks
-        # sometimes format is like: json\n[ ... ]
+        # Sometimes format is like: json\n[ ... ]
         if raw_text.lower().startswith("json"):
             raw_text = raw_text[4:].strip()
 
     try:
-        qa_list = json.loads(raw_text)
+        qa_list: list = json.loads(raw_text)
         # Ensure it's a list of dicts with "question" and "answer"
         qa_list = [
             {
